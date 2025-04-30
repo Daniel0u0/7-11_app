@@ -17,5 +17,17 @@
             android:id="@+id/nav_product"
             android:icon="@drawable/need"
             android:title="Product"/>
+        <item
+            android:id="@+id/nav_help"
+            android:icon="@drawable/need"
+            android:title="Help"/>
+    </group>
+
+    <!-- Separate group for Login/Register to avoid checkable behavior -->
+    <group>
+        <item
+            android:id="@+id/nav_login_register"
+            android:icon="@drawable/need"
+            android:title="Login/Register"/>
     </group>
 </menu>

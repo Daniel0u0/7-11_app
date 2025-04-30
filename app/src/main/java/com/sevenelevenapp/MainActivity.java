@@ -3,6 +3,7 @@ package com.sevenelevenapp;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
@@ -17,6 +18,9 @@ import com.sevenelevenapp.DiscountFragment;
 import com.sevenelevenapp.HomeFragment;
 import com.sevenelevenapp.PreorderFragment;
 import com.sevenelevenapp.ProductFragment;
+import com.sevenelevenapp.LoginFragment;
+import com.sevenelevenapp.RegisterFragment;
+import com.sevenelevenapp.HelpFragment;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -24,6 +28,7 @@ public class MainActivity extends AppCompatActivity {
     private NavigationView navigationView;
     private BottomNavigationView bottomNavigationView;
     private ImageView menuIcon;
+    private Button loginButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,9 +44,22 @@ public class MainActivity extends AppCompatActivity {
         navigationView = findViewById(R.id.nav_view);
         bottomNavigationView = findViewById(R.id.bottom_navigation);
         menuIcon = findViewById(R.id.menu_icon);
+        loginButton = findViewById(R.id.login_button);
 
         // Open Drawer on Menu Icon Click
         menuIcon.setOnClickListener(v -> drawerLayout.openDrawer(GravityCompat.START));
+
+        // Navigate to LoginFragment on Login Button Click
+        loginButton.setOnClickListener(v -> {
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.fragment_container, new LoginFragment())
+                    .addToBackStack(null)
+                    .commit();
+            // Deselect all BottomNavigationView items
+            bottomNavigationView.setSelectedItemId(-1);
+            // Deselect all NavigationView items
+            navigationView.setCheckedItem(-1);
+        });
 
         // Navigation Drawer Item Selection
         navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
@@ -51,9 +69,14 @@ public class MainActivity extends AppCompatActivity {
                 if (selectedFragment != null) {
                     getSupportFragmentManager().beginTransaction()
                             .replace(R.id.fragment_container, selectedFragment)
+                            .addToBackStack(null)
                             .commit();
                     // Sync BottomNavigationView with NavigationView
-                    bottomNavigationView.setSelectedItemId(item.getItemId());
+                    if (item.getItemId() != R.id.nav_login_register) {
+                        bottomNavigationView.setSelectedItemId(item.getItemId());
+                    } else {
+                        bottomNavigationView.setSelectedItemId(-1);
+                    }
                 }
                 drawerLayout.closeDrawer(GravityCompat.START);
                 return true;
@@ -68,6 +91,9 @@ public class MainActivity extends AppCompatActivity {
             navigationView.setCheckedItem(R.id.nav_home);
             bottomNavigationView.setSelectedItemId(R.id.nav_home);
         }
+
+        // Setup BottomNavigationView
+        setupBottomNavigation();
 
         // Handle Back Press using OnBackPressedDispatcher
         getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
@@ -99,7 +125,6 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    // Extracted method to determine the fragment based on menu item ID
     // Method to determine the fragment based on menu item ID
     private Fragment getFragmentForMenuItem(int itemId) {
         if (itemId == R.id.nav_home) {
@@ -110,6 +135,10 @@ public class MainActivity extends AppCompatActivity {
             return new PreorderFragment();
         } else if (itemId == R.id.nav_product) {
             return new ProductFragment();
+        } else if (itemId == R.id.nav_help) {
+            return new HelpFragment();
+        } else if (itemId == R.id.nav_login_register) {
+            return new LoginFragment(); // Navigate to LoginFragment by default
         }
         return null;
     }

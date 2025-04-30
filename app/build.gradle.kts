@@ -49,4 +49,5 @@ dependencies {
     annotationProcessor("com.github.bumptech.glide:compiler:4.16.0")
     // OR Picasso (alternative)
     implementation("com.squareup.picasso:picasso:2.8")
+    implementation ("com.google.android.gms:play-services-location:21.0.1")
 }

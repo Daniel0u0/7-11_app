@@ -2,18 +2,14 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
         android:id="@+id/nav_home"
-        android:icon="@drawable/need"
         android:title="Home"/>
     <item
         android:id="@+id/nav_discount"
-        android:icon="@drawable/need"
         android:title="Discount"/>
     <item
         android:id="@+id/nav_preorder"
-        android:icon="@drawable/need"
         android:title="Preorder"/>
     <item
         android:id="@+id/nav_product"
-        android:icon="@drawable/need"
         android:title="Product"/>
 </menu>

@@ -1,44 +1,45 @@
 package com.sevenelevenapp;
 
+import android.Manifest;
+import android.content.pm.PackageManager;
+import android.location.Location;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-import org.json.JSONObject;
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.tasks.OnSuccessListener;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 public class HomeFragment extends Fragment {
 
-    private RecyclerView productList;
+    private ListView productList;
     private ProgressBar loadingIndicator;
+    private TextView nearestStoreTextView;
+    private FusedLocationProviderClient fusedLocationClient;
+    private static final int LOCATION_PERMISSION_REQUEST_CODE = 100;
 
-    // Product class (same as before)
-    static class Product {
+    // Store class for 7-11 locations
+    static class Store {
         String name;
-        String price;
-        String imageUrl;
-        String storeLocation;
-        String sentimentScore;
+        double latitude;
+        double longitude;
 
-        Product(String name, String price, String imageUrl, String storeLocation, String sentimentScore) {
+        Store(String name, double latitude, double longitude) {
             this.name = name;
-            this.price = price;
-            this.imageUrl = imageUrl;
-            this.storeLocation = storeLocation;
-            this.sentimentScore = sentimentScore;
+            this.latitude = latitude;
+            this.longitude = longitude;
         }
     }
 
@@ -51,133 +52,109 @@ public class HomeFragment extends Fragment {
         productList = view.findViewById(R.id.product_list);
         loadingIndicator = view.findViewById(R.id.loading_indicator);
 
-        // Setup RecyclerView
-        productList.setLayoutManager(new LinearLayoutManager(getContext()));
-        productList.setAdapter(new ProductAdapter(new ArrayList<>()));
+        // Add Header for Nearest Store
+        View headerView = inflater.inflate(R.layout.header_nearest_store, productList, false);
+        nearestStoreTextView = headerView.findViewById(R.id.nearest_store);
+        productList.addHeaderView(headerView, null, false);
 
         // Setup Bottom Navigation
         if (getActivity() instanceof MainActivity) {
             ((MainActivity) getActivity()).setupBottomNavigation();
         }
 
-        // Fetch and Display Data
-        new Thread(this::fetchAndProcessData).start();
+        // Initialize Location Client
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(getActivity());
+
+        // Fetch Location and Nearest Store
+        fetchUserLocation();
+
+        // Load and Display Product Data
+        loadProductData();
 
         return view;
     }
 
-    // Fetch and Process Data (same as before)
-    private void fetchAndProcessData() {
-        List<Product> products = new ArrayList<>();
-        try {
-            // Simulate API call
-            String apiUrl = "http://your-python-api.example.com/scrape";
-            URL url = new URL(apiUrl);
-            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-            conn.setRequestMethod("GET");
+    private void fetchUserLocation() {
+        if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
+                ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, LOCATION_PERMISSION_REQUEST_CODE);
+            return;
+        }
 
-            BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-            StringBuilder response = new StringBuilder();
-            String line;
-            while ((line = reader.readLine()) != null) {
-                response.append(line);
+        fusedLocationClient.getLastLocation().addOnSuccessListener(getActivity(), new OnSuccessListener<Location>() {
+            @Override
+            public void onSuccess(Location location) {
+                if (location != null) {
+                    findNearestStore(location);
+                } else {
+                    if (getActivity() != null) {
+                        getActivity().runOnUiThread(() -> nearestStoreTextView.setText("Unable to fetch location"));
+                    }
+                }
             }
-            reader.close();
+        });
+    }
 
-            JSONObject jsonResponse = new JSONObject(response.toString());
-            String name = jsonResponse.getString("name");
-            String price = jsonResponse.getString("price");
-            String imageUrl = jsonResponse.getString("image_url");
-            String location = jsonResponse.getString("store_location");
-            String sentimentScore = performSentimentAnalysis(name);
-
-            Product product = new Product(name, price, imageUrl, location, sentimentScore);
-            products.add(product);
-
-            // Update UI
-            if (getActivity() != null) {
-                getActivity().runOnUiThread(() -> {
-                    productList.setAdapter(new ProductAdapter(products));
-                    loadingIndicator.setVisibility(View.GONE);
-                });
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            if (getActivity() != null) {
-                getActivity().runOnUiThread(() -> loadingIndicator.setVisibility(View.GONE));
-            }
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == LOCATION_PERMISSION_REQUEST_CODE && grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            fetchUserLocation();
+        } else {
+            nearestStoreTextView.setText("Location permission denied");
         }
     }
 
-    // Simulate Sentiment Analysis (same as before)
-    private String performSentimentAnalysis(String productName) {
-        try {
-            String sentimentApiUrl = "http://your-python-api.example.com/sentiment?product=" + productName;
-            URL url = new URL(sentimentApiUrl);
-            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-            conn.setRequestMethod("GET");
+    private void findNearestStore(Location userLocation) {
+        // Mocked list of 7-11 stores (replace with actual data)
+        List<Store> stores = new ArrayList<>();
+        stores.add(new Store("7-11 Central", 22.2799, 114.1588)); // Central, Hong Kong
+        stores.add(new Store("7-11 Kowloon", 22.3167, 114.1833)); // Kowloon, Hong Kong
+        stores.add(new Store("7-11 Causeway Bay", 22.2807, 114.1849)); // Causeway Bay, Hong Kong
 
-            BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-            StringBuilder response = new StringBuilder();
-            String line;
-            while ((line = reader.readLine()) != null) {
-                response.append(line);
+        Store nearestStore = null;
+        float minDistance = Float.MAX_VALUE;
+
+        for (Store store : stores) {
+            float[] results = new float[1];
+            Location.distanceBetween(userLocation.getLatitude(), userLocation.getLongitude(), store.latitude, store.longitude, results);
+            float distance = results[0];
+            if (distance < minDistance) {
+                //discount var bug
+                minDistance = 10;
+                nearestStore = store;
             }
-            reader.close();
+        }
 
-            JSONObject jsonResponse = new JSONObject(response.toString());
-            return jsonResponse.getString("sentiment_score");
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            return "N/A";
+        if (nearestStore != null) {
+            String storeInfo = nearestStore.name + " (" + String.format("%.2f km)", minDistance / 1000);
+            nearestStoreTextView.setText(storeInfo);
+        } else {
+            nearestStoreTextView.setText("No stores found");
         }
     }
 
-    // RecyclerView Adapter
-    private class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ViewHolder> {
-        private List<Product> products;
+    private void loadProductData() {
+        loadingIndicator.setVisibility(View.VISIBLE);
 
-        public ProductAdapter(List<Product> products) {
-            this.products = products;
-        }
+        // Load products from ProductData
+        List<ProductData.Product> products = ProductData.getProducts();
 
-        @NonNull
-        @Override
-        public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-            View view = LayoutInflater.from(parent.getContext())
-                    .inflate(R.layout.item_product, parent, false);
-            return new ViewHolder(view);
-        }
-
-        @Override
-        public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-            Product product = products.get(position);
-            holder.productName.setText(product.name);
-            holder.productPrice.setText("Price: " + product.price);
-            holder.storeLocation.setText("Store: " + product.storeLocation);
-            holder.sentimentScore.setText("Sentiment Score: " + product.sentimentScore);
-            // Load image with Glide/Picasso if needed
-        }
-
-        @Override
-        public int getItemCount() {
-            return products.size();
-        }
-
-        class ViewHolder extends RecyclerView.ViewHolder {
-            TextView productName, productPrice, storeLocation, sentimentScore;
-            ImageView productImage;
-
-            ViewHolder(View itemView) {
-                super(itemView);
-                productName = itemView.findViewById(R.id.product_name);
-                productPrice = itemView.findViewById(R.id.product_price);
-                storeLocation = itemView.findViewById(R.id.store_location);
-                sentimentScore = itemView.findViewById(R.id.sentiment_score);
-                productImage = itemView.findViewById(R.id.product_image);
+        // Sort products by date (newest first)
+        Collections.sort(products, new Comparator<ProductData.Product>() {
+            @Override
+            public int compare(ProductData.Product p1, ProductData.Product p2) {
+                return p2.getDate().compareTo(p1.getDate());
             }
-        }
+        });
+
+        // Display all products
+        List<ProductData.Product> displayProducts = new ArrayList<>(products);
+
+        // Setup ListView Adapter
+        ProductAdapter adapter = new ProductAdapter(getContext(), displayProducts);
+        productList.setAdapter(adapter);
+
+        loadingIndicator.setVisibility(View.GONE);
     }
 }

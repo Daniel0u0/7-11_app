@@ -15,5 +15,11 @@
         <!-- Disable default ActionBar -->
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
+        <!-- BottomNavigationView text size -->
+        <item name="bottomNavigationStyle">@style/Widget.App.BottomNavigationView</item>
+    </style>
+
+    <style name="Widget.App.BottomNavigationView" parent="Widget.MaterialComponents.BottomNavigationView.Colored">
+        <item name="android:textSize">12sp</item>
     </style>
 </resources>

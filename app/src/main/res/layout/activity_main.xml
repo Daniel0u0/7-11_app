@@ -13,7 +13,7 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
-        <!-- Toolbar with Menu Icon and Title -->
+        <!-- Toolbar with Menu Icon, Title, and Login Button -->
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
@@ -23,23 +23,49 @@
             android:popupTheme="@style/ThemeOverlay.AppCompat.Light"
             android:elevation="4dp">
 
-            <ImageView
-                android:id="@+id/menu_icon"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:src="@drawable/need"
-                android:contentDescription="Menu"
-                android:layout_marginStart="16dp"/>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
 
-            <TextView
-                android:id="@+id/app_title"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Hong Kong 7-11 New Product Info"
-                android:textSize="20sp"
-                android:textStyle="bold"
-                android:textColor="?attr/colorOnPrimary"
-                android:layout_gravity="center"/>
+                <!-- Menu Icon -->
+                <ImageView
+                    android:id="@+id/menu_icon"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@drawable/need"
+                    android:contentDescription="Menu"
+                    android:layout_marginStart="16dp"/>
+
+                <!-- Title -->
+                <TextView
+                    android:id="@+id/app_title"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginEnd="8dp"
+                    android:text="Hong Kong 7-11 New Product Info"
+                    android:textSize="20sp"
+                    android:textStyle="bold"
+                    android:textColor="?attr/colorOnPrimary"
+                    android:gravity="center"
+                    android:ellipsize="end"
+                    android:singleLine="true"/>
+
+                <!-- Login Button -->
+                <Button
+                    android:id="@+id/login_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="16dp"
+                    android:text="Login"
+                    android:textSize="14sp"
+                    android:textColor="?attr/colorOnPrimary"
+                    android:backgroundTint="?attr/colorSecondary"
+                    style="@style/Widget.MaterialComponents.Button.TextButton"/>
+            </LinearLayout>
         </androidx.appcompat.widget.Toolbar>
 
         <!-- Fragment Container -->
@@ -57,6 +83,7 @@
             android:background="?attr/colorPrimary"
             app:itemIconTint="?attr/colorOnPrimary"
             app:itemTextColor="?attr/colorOnPrimary"
+            app:labelVisibilityMode="labeled"
             app:menu="@menu/bottom_nav_menu"/>
 
     </LinearLayout>

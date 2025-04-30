@@ -4,23 +4,24 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
+    android:gravity="center"
     android:padding="16dp"
     android:background="#E0F7FA">
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Stitch精品及外遊用品"
-        android:textSize="20sp"
+        android:text="Help"
+        android:textSize="24sp"
         android:textStyle="bold"
         android:textColor="#000000"/>
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/product_recycler_view"
-        android:layout_width="match_parent"
+    <TextView
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:orientation="horizontal"
-        android:scrollbars="horizontal"/>
+        android:layout_marginTop="16dp"
+        android:text="For assistance, please contact support at support@sevenelevenapp.com."
+        android:textSize="16sp"
+        android:textColor="#000000"/>
 
 </LinearLayout>
