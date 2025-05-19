@@ -6,11 +6,16 @@
     android:orientation="vertical"
     android:background="#F5F5F5">
 
-    <!-- ListView for Product List -->
-    <ListView
+    <!-- Include Header -->
+    <include layout="@layout/header_discount" />
+
+    <!-- RecyclerView for Discount Products -->
+    <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/discount_product_list"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        android:layout_height="match_parent"
+        android:layout_marginTop="8dp"
+        android:scrollbars="vertical" />
 
     <!-- Loading Indicator -->
     <ProgressBar

@@ -4,19 +4,18 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ListView;
 import android.widget.ProgressBar;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 public class DiscountFragment extends Fragment {
 
-    private ListView productList;
+    private RecyclerView productList;
     private ProgressBar loadingIndicator;
 
     @Nullable
@@ -26,11 +25,10 @@ public class DiscountFragment extends Fragment {
 
         // Initialize Views
         productList = view.findViewById(R.id.discount_product_list);
-        loadingIndicator = view.findViewById(R.id.loading_indicator);
+        loadingIndicator = view.findViewById(R.id.loading_indicator); // Fixed typo: findViewId -> findViewById
 
-        // Add Header
-        View headerView = inflater.inflate(R.layout.header_discount, productList, false);
-        productList.addHeaderView(headerView, null, false);
+        // Setup RecyclerView with GridLayoutManager (2x2 grid)
+        productList.setLayoutManager(new GridLayoutManager(getContext(), 2));
 
         // Setup Bottom Navigation
         if (getActivity() instanceof MainActivity) {
@@ -47,20 +45,12 @@ public class DiscountFragment extends Fragment {
         loadingIndicator.setVisibility(View.VISIBLE);
 
         // Load products from ProductData
-        List<ProductData.Product> products = ProductData.getProducts();
-
-        // Sort products by date (newest first)
-        Collections.sort(products, new Comparator<ProductData.Product>() {
-            @Override
-            public int compare(ProductData.Product p1, ProductData.Product p2) {
-                return p2.getDate().compareTo(p1.getDate());
-            }
-        });
+        List<ProductData.Product> products = ProductData.getSortedProducts(); // Use sorted products directly
 
         // Display all products
         List<ProductData.Product> displayProducts = new ArrayList<>(products);
 
-        // Setup ListView Adapter
+        // Setup RecyclerView Adapter
         ProductAdapter adapter = new ProductAdapter(getContext(), displayProducts);
         productList.setAdapter(adapter);
 

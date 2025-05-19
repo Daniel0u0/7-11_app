@@ -7,24 +7,23 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnSuccessListener;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 public class HomeFragment extends Fragment {
 
-    private ListView productList;
+    private RecyclerView productList;
     private ProgressBar loadingIndicator;
     private TextView nearestStoreTextView;
     private FusedLocationProviderClient fusedLocationClient;
@@ -51,11 +50,7 @@ public class HomeFragment extends Fragment {
         // Initialize Views
         productList = view.findViewById(R.id.product_list);
         loadingIndicator = view.findViewById(R.id.loading_indicator);
-
-        // Add Header for Nearest Store
-        View headerView = inflater.inflate(R.layout.header_nearest_store, productList, false);
-        nearestStoreTextView = headerView.findViewById(R.id.nearest_store);
-        productList.addHeaderView(headerView, null, false);
+        nearestStoreTextView = view.findViewById(R.id.nearest_store);
 
         // Setup Bottom Navigation
         if (getActivity() instanceof MainActivity) {
@@ -63,7 +58,7 @@ public class HomeFragment extends Fragment {
         }
 
         // Initialize Location Client
-        fusedLocationClient = LocationServices.getFusedLocationProviderClient(getActivity());
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity());
 
         // Fetch Location and Nearest Store
         fetchUserLocation();
@@ -81,14 +76,14 @@ public class HomeFragment extends Fragment {
             return;
         }
 
-        fusedLocationClient.getLastLocation().addOnSuccessListener(getActivity(), new OnSuccessListener<Location>() {
+        fusedLocationClient.getLastLocation().addOnSuccessListener(requireActivity(), new OnSuccessListener<Location>() {
             @Override
             public void onSuccess(Location location) {
                 if (location != null) {
                     findNearestStore(location);
                 } else {
                     if (getActivity() != null) {
-                        getActivity().runOnUiThread(() -> nearestStoreTextView.setText("Unable to fetch location"));
+                        requireActivity().runOnUiThread(() -> nearestStoreTextView.setText("無法獲取定位"));
                     }
                 }
             }
@@ -101,7 +96,7 @@ public class HomeFragment extends Fragment {
         if (requestCode == LOCATION_PERMISSION_REQUEST_CODE && grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
             fetchUserLocation();
         } else {
-            nearestStoreTextView.setText("Location permission denied");
+            nearestStoreTextView.setText("未授權定位權限");
         }
     }
 
@@ -120,8 +115,7 @@ public class HomeFragment extends Fragment {
             Location.distanceBetween(userLocation.getLatitude(), userLocation.getLongitude(), store.latitude, store.longitude, results);
             float distance = results[0];
             if (distance < minDistance) {
-                //discount var bug
-                minDistance = 10;
+                minDistance = distance;
                 nearestStore = store;
             }
         }
@@ -138,21 +132,11 @@ public class HomeFragment extends Fragment {
         loadingIndicator.setVisibility(View.VISIBLE);
 
         // Load products from ProductData
-        List<ProductData.Product> products = ProductData.getProducts();
+        List<ProductData.Product> products = ProductData.getSortedProducts();
 
-        // Sort products by date (newest first)
-        Collections.sort(products, new Comparator<ProductData.Product>() {
-            @Override
-            public int compare(ProductData.Product p1, ProductData.Product p2) {
-                return p2.getDate().compareTo(p1.getDate());
-            }
-        });
-
-        // Display all products
-        List<ProductData.Product> displayProducts = new ArrayList<>(products);
-
-        // Setup ListView Adapter
-        ProductAdapter adapter = new ProductAdapter(getContext(), displayProducts);
+        // Setup RecyclerView with GridLayoutManager
+        productList.setLayoutManager(new GridLayoutManager(getContext(), 2)); // 2x2 grid layout
+        ProductAdapter adapter = new ProductAdapter(getContext(), products);
         productList.setAdapter(adapter);
 
         loadingIndicator.setVisibility(View.GONE);
