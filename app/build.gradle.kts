@@ -57,6 +57,8 @@ dependencies {
 
     // Location services
     implementation("com.google.android.gms:play-services-location:21.0.1")
+
     implementation ("com.squareup.picasso:picasso:2.71828")
+    implementation ("com.google.android.material:material:1.12.0")
 
 }

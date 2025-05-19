@@ -13,46 +13,56 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
-        <!-- Toolbar with Menu Icon, Title, and Login Button -->
+        <!-- Toolbar with Title and Login Button -->
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
+            android:layout_height="wrap_content"
             android:background="?attr/colorPrimary"
             android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
             android:popupTheme="@style/ThemeOverlay.AppCompat.Light"
-            android:elevation="4dp">
+            android:elevation="4dp"
+            android:paddingTop="8dp"
+            android:paddingBottom="8dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:gravity="center_vertical">
 
-                <!-- Menu Icon -->
-                <ImageView
-                    android:id="@+id/menu_icon"
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:src="@drawable/need"
-                    android:contentDescription="Menu"
-                    android:layout_marginStart="16dp"/>
-
-                <!-- Title -->
-                <TextView
-                    android:id="@+id/app_title"
+                <!-- Title Container -->
+                <LinearLayout
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:layout_marginStart="8dp"
                     android:layout_marginEnd="8dp"
-                    android:text="Hong Kong 7-11 New Product Info"
-                    android:textSize="20sp"
-                    android:textStyle="bold"
-                    android:textColor="?attr/colorOnPrimary"
-                    android:gravity="center"
-                    android:ellipsize="end"
-                    android:singleLine="true"/>
+                    android:orientation="vertical"
+                    android:gravity="center_horizontal">
+
+                    <TextView
+                        android:id="@+id/app_title_main"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Hong Kong 7-11"
+                        android:textSize="18sp"
+                        android:textStyle="bold"
+                        android:textColor="?attr/colorOnPrimary"
+                        android:maxLines="1"
+                        android:ellipsize="end"/>
+
+                    <TextView
+                        android:id="@+id/app_subtitle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="New Product Info"
+                        android:textSize="14sp"
+                        android:textColor="?attr/colorOnPrimary"
+                        android:layout_marginTop="2dp"
+                        android:maxLines="1"
+                        android:ellipsize="end"/>
+                </LinearLayout>
 
                 <!-- Login Button -->
                 <Button
@@ -64,6 +74,8 @@
                     android:textSize="14sp"
                     android:textColor="?attr/colorOnPrimary"
                     android:backgroundTint="?attr/colorSecondary"
+                    android:drawableStart="@drawable/ic_login"
+                    android:drawablePadding="4dp"
                     style="@style/Widget.MaterialComponents.Button.TextButton"/>
             </LinearLayout>
         </androidx.appcompat.widget.Toolbar>
@@ -94,7 +106,10 @@
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_gravity="start"
+        android:theme="@style/Theme.SevenElevenApp"
+        android:background="?attr/colorPrimary"
         app:menu="@menu/nav_menu"
-        app:headerLayout="@layout/nav_header"/>
+        app:itemTextColor="?attr/colorOnPrimary"
+        app:itemIconTint="?attr/colorOnPrimary"/>
 
 </androidx.drawerlayout.widget.DrawerLayout>

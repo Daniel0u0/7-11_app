@@ -4,31 +4,24 @@ import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
-import android.widget.ImageView;
 import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
-import com.sevenelevenapp.DiscountFragment;
-import com.sevenelevenapp.HomeFragment;
-import com.sevenelevenapp.PreorderFragment;
-import com.sevenelevenapp.ProductFragment;
-import com.sevenelevenapp.LoginFragment;
-import com.sevenelevenapp.RegisterFragment;
-import com.sevenelevenapp.HelpFragment;
 
 public class MainActivity extends AppCompatActivity {
 
     private DrawerLayout drawerLayout;
     private NavigationView navigationView;
     private BottomNavigationView bottomNavigationView;
-    private ImageView menuIcon;
     private Button loginButton;
+    private ActionBarDrawerToggle drawerToggle;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,51 +36,45 @@ public class MainActivity extends AppCompatActivity {
         drawerLayout = findViewById(R.id.drawer_layout);
         navigationView = findViewById(R.id.nav_view);
         bottomNavigationView = findViewById(R.id.bottom_navigation);
-        menuIcon = findViewById(R.id.menu_icon);
         loginButton = findViewById(R.id.login_button);
 
-        // Open Drawer on Menu Icon Click
-        menuIcon.setOnClickListener(v -> drawerLayout.openDrawer(GravityCompat.START));
+        // Set up ActionBarDrawerToggle for the hamburger icon
+        drawerToggle = new ActionBarDrawerToggle(
+                this,
+                drawerLayout,
+                toolbar,
+                R.string.navigation_drawer_open,
+                R.string.navigation_drawer_close);
+        drawerLayout.addDrawerListener(drawerToggle);
+        drawerToggle.syncState();
 
         // Navigate to LoginFragment on Login Button Click
         loginButton.setOnClickListener(v -> {
-            getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.fragment_container, new LoginFragment())
-                    .addToBackStack(null)
-                    .commit();
-            // Deselect all BottomNavigationView items
+            navigateToFragment(new LoginFragment());
+            // Deselect all BottomNavigationView and NavigationView items
             bottomNavigationView.setSelectedItemId(-1);
-            // Deselect all NavigationView items
             navigationView.setCheckedItem(-1);
         });
 
         // Navigation Drawer Item Selection
-        navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
-            @Override
-            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                Fragment selectedFragment = getFragmentForMenuItem(item.getItemId());
-                if (selectedFragment != null) {
-                    getSupportFragmentManager().beginTransaction()
-                            .replace(R.id.fragment_container, selectedFragment)
-                            .addToBackStack(null)
-                            .commit();
-                    // Sync BottomNavigationView with NavigationView
-                    if (item.getItemId() != R.id.nav_login_register) {
-                        bottomNavigationView.setSelectedItemId(item.getItemId());
-                    } else {
-                        bottomNavigationView.setSelectedItemId(-1);
-                    }
+        navigationView.setNavigationItemSelectedListener(item -> {
+            Fragment selectedFragment = getFragmentForMenuItem(item.getItemId());
+            if (selectedFragment != null) {
+                navigateToFragment(selectedFragment);
+                // Sync BottomNavigationView with NavigationView
+                if (item.getItemId() != R.id.nav_login_register) {
+                    bottomNavigationView.setSelectedItemId(item.getItemId());
+                } else {
+                    bottomNavigationView.setSelectedItemId(-1);
                 }
-                drawerLayout.closeDrawer(GravityCompat.START);
-                return true;
             }
+            drawerLayout.closeDrawer(GravityCompat.START);
+            return true;
         });
 
         // Load HomeFragment by default
         if (savedInstanceState == null) {
-            getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.fragment_container, new HomeFragment())
-                    .commit();
+            navigateToFragment(new HomeFragment());
             navigationView.setCheckedItem(R.id.nav_home);
             bottomNavigationView.setSelectedItemId(R.id.nav_home);
         }
@@ -102,9 +89,17 @@ public class MainActivity extends AppCompatActivity {
                 if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
                     drawerLayout.closeDrawer(GravityCompat.START);
                 } else {
-                    setEnabled(false);
-                    getOnBackPressedDispatcher().onBackPressed();
-                    setEnabled(true);
+                    // If not on HomeFragment, navigate back to HomeFragment
+                    Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
+                    if (!(currentFragment instanceof HomeFragment)) {
+                        navigateToFragment(new HomeFragment());
+                        navigationView.setCheckedItem(R.id.nav_home);
+                        bottomNavigationView.setSelectedItemId(R.id.nav_home);
+                    } else {
+                        setEnabled(false);
+                        getOnBackPressedDispatcher().onBackPressed();
+                        setEnabled(true);
+                    }
                 }
             }
         });
@@ -115,9 +110,7 @@ public class MainActivity extends AppCompatActivity {
         bottomNavigationView.setOnItemSelectedListener(item -> {
             Fragment selectedFragment = getFragmentForMenuItem(item.getItemId());
             if (selectedFragment != null) {
-                getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.fragment_container, selectedFragment)
-                        .commit();
+                navigateToFragment(selectedFragment);
                 // Sync NavigationView with BottomNavigationView
                 navigationView.setCheckedItem(item.getItemId());
             }
@@ -141,5 +134,13 @@ public class MainActivity extends AppCompatActivity {
             return new LoginFragment(); // Navigate to LoginFragment by default
         }
         return null;
+    }
+
+    // Helper method to navigate to a fragment
+    private void navigateToFragment(Fragment fragment) {
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.fragment_container, fragment)
+                .addToBackStack(null)
+                .commit();
     }
 }
