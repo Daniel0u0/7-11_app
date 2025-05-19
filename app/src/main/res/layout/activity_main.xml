@@ -13,7 +13,7 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
-        <!-- Toolbar with Title and Login Button -->
+        <!-- Toolbar with Title, Username, and Login Button -->
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
@@ -33,40 +33,35 @@
                 android:orientation="horizontal"
                 android:gravity="center_vertical">
 
-                <!-- Title Container -->
-                <LinearLayout
+                <!-- Title -->
+                <TextView
+                    android:id="@+id/toolbar_title"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:layout_marginStart="8dp"
                     android:layout_marginEnd="8dp"
-                    android:orientation="vertical"
-                    android:gravity="center_horizontal">
+                    android:text="Hong Kong 7-11"
+                    android:textSize="20sp"
+                    android:textStyle="bold"
+                    android:textColor="?attr/colorOnPrimary"
+                    android:gravity="center"
+                    android:maxLines="1"
+                    android:ellipsize="end"/>
 
-                    <TextView
-                        android:id="@+id/app_title_main"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Hong Kong 7-11"
-                        android:textSize="20sp"
-                        android:textStyle="bold"
-                        android:textColor="?attr/colorOnPrimary"
-                        android:maxLines="1"
-                        android:ellipsize="end"/>
+                <!-- Username (visible when logged in on HomeFragment) -->
+                <TextView
+                    android:id="@+id/toolbar_username"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="8dp"
+                    android:textSize="14sp"
+                    android:textColor="?attr/colorOnPrimary"
+                    android:visibility="gone"
+                    android:maxLines="1"
+                    android:ellipsize="end"/>
 
-                    <TextView
-                        android:id="@+id/app_subtitle"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="New Product Info"
-                        android:textSize="14sp"
-                        android:textColor="?attr/colorOnPrimary"
-                        android:layout_marginTop="4dp"
-                        android:maxLines="1"
-                        android:ellipsize="end"/>
-                </LinearLayout>
-
-                <!-- Login Button -->
+                <!-- Login Button (visible when not on HomeFragment or logged out) -->
                 <Button
                     android:id="@+id/login_button"
                     android:layout_width="wrap_content"
