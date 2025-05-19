@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fillViewport="true"
-    android:background="#F5F5F5">
+    android:background="?android:attr/colorBackground">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -19,7 +19,7 @@
             android:text="Nearest 7-11 Store"
             android:textSize="20sp"
             android:textStyle="bold"
-            android:textColor="#000000"/>
+            android:textColor="?attr/colorOnBackground"/>
 
         <TextView
             android:id="@+id/nearest_store"
@@ -28,7 +28,8 @@
             android:layout_marginTop="8dp"
             android:text="Fetching location..."
             android:textSize="16sp"
-            android:textColor="#666666"/>
+            android:textColor="?attr/colorOnBackground"
+            android:alpha="0.7"/>
 
         <!-- Newest Product Section -->
         <TextView
@@ -38,7 +39,7 @@
             android:text="Newest Product"
             android:textSize="20sp"
             android:textStyle="bold"
-            android:textColor="#000000"/>
+            android:textColor="?attr/colorOnBackground"/>
 
         <!-- RecyclerView for 2x2 Grid Layout -->
         <androidx.recyclerview.widget.RecyclerView

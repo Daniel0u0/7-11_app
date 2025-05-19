@@ -4,25 +4,25 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="#F5F5F5">
+    android:background="?android:attr/colorBackground">
 
     <!-- Include Header -->
     <include layout="@layout/header_discount" />
+    
+        <!-- RecyclerView for Discount Products -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/discount_product_list"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="8dp"
+            android:scrollbars="vertical" />
 
-    <!-- RecyclerView for Discount Products -->
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/discount_product_list"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginTop="8dp"
-        android:scrollbars="vertical" />
+        <!-- Loading Indicator -->
+        <ProgressBar
+            android:id="@+id/loading_indicator"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:visibility="gone"/>
 
-    <!-- Loading Indicator -->
-    <ProgressBar
-        android:id="@+id/loading_indicator"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:visibility="gone"/>
-
-</LinearLayout>
+    </LinearLayout>
