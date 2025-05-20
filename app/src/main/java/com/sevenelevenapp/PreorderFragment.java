@@ -20,6 +20,14 @@ public class PreorderFragment extends Fragment {
     private ProgressBar loadingIndicator;
     private static final String TAG = "PreorderFragment";
 
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        // Initialize the Room database
+        ProductData.initializeDatabase(requireContext());
+    }
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -50,11 +58,11 @@ public class PreorderFragment extends Fragment {
         loadingIndicator.setVisibility(View.VISIBLE);
 
         // Load products from ProductData
-        List<ProductData.Product> products = ProductData.getSortedProducts(); // Use sorted products directly
+        List<Product> products = ProductData.getSortedProducts(); // Changed from ProductData.Product to Product
         Log.d(TAG, "Number of products loaded: " + products.size());
 
         // Display all products
-        List<ProductData.Product> displayProducts = new ArrayList<>(products);
+        List<Product> displayProducts = new ArrayList<>(products); // Changed from ProductData.Product to Product
         Log.d(TAG, "Number of products to display: " + displayProducts.size());
 
         // Setup RecyclerView Adapter
