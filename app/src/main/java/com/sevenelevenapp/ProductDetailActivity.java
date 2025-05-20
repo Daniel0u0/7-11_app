@@ -1,6 +1,7 @@
 package com.sevenelevenapp;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
@@ -48,16 +49,23 @@ public class ProductDetailActivity extends AppCompatActivity {
             preOrderDateTextView.setText("Pre-Order Date: " + product.getPre_order_date());
             pickupDateTextView.setText("Pickup Date: " + product.getPickup_date());
             detailsTextView.setText(product.getProduct_details());
-            linkTextView.setText("Link: " + product.getLink());
+            linkTextView.setText(product.getLink()); // Removed "Link: " prefix
+
+            // Make the link clickable
+            linkTextView.setOnClickListener(v -> {
+                String url = product.getLink();
+                if (url != null && !url.isEmpty()) {
+                    Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+                    startActivity(intent);
+                }
+            });
         } else {
             nameTextView.setText("Error: Product data not found");
+            linkTextView.setText("Link: N/A");
         }
     }
 
     private void setupBottomNavigation() {
-        // Set the selected item (optional, e.g., highlight the current fragment)
-        // bottomNavigationView.setSelectedItemId(R.id.nav_discount); // Uncomment if you want to highlight the Discount tab
-
         bottomNavigationView.setOnItemSelectedListener(item -> {
             int itemId = item.getItemId();
             Intent intent = new Intent(this, MainActivity.class);

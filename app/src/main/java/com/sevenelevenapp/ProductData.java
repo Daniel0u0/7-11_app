@@ -1,7 +1,9 @@
 package com.sevenelevenapp;
 
 import android.content.Context;
+import android.util.Log;
 import androidx.room.Room;
+import java.io.InputStream;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -9,10 +11,13 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 public class ProductData {
     private static AppDatabase db;
     private static boolean isDatabaseInitialized = false;
+    private static final String TAG = "ProductData";
 
     // Initialize the Room database
     public static void initializeDatabase(Context context) {
@@ -22,21 +27,42 @@ public class ProductData {
                     .allowMainThreadQueries() // For simplicity; in production, use background threads
                     .build();
 
-            // Preload the database with data if it's empty
-            List<Product> existingProducts = db.productDao().getAllProducts();
-            if (existingProducts.isEmpty()) {
-                List<Product> initialProducts = new ArrayList<>();
-                // Add sample data (from your JSON)
-                initialProducts.add(new Product(
-                        "Care Bears粉紅色不鏽鋼杯連立體造型蓋",
-                        "$159.00",
-                        "China",
-                        "2024年06月26日 00:00 - 2025年12月31日 23:59",
-                        "N/A",
-                        "今次7-11推出Care Bears的便攜杯，立體杯蓋用上了兩款Care Bears公仔既可愛頭型，令人一見即愛﹗提提你「見杯飲水」，令你使用時倍感窩心！不鏽鋼杯身連飲管保溫之餘，方便隨時隨地享用，而且又衛生又環保，粉絲們仲唔快啲帶晒佢哋返屋企﹗\n產品尺寸:约12.2 x 12.2 x 29.5 cm\n條款及細則",
-                        "https://www.7-eleven.com.hk/zh-hant/p/Care%20Bears%E7%B2%89%E7%B4%85%E8%89%B2%E4%B8%8D%E9%8F%BD%E9%8B%BC%E6%9D%AF%E9%80%A0%E5%9E%8B%E8%93%8B/i/114977471.html"
-                ));
-                // Add more products as needed
+            // Clear the database to ensure fresh data (for testing purposes)
+            db.clearAllTables();
+            Log.d(TAG, "Database cleared");
+
+            // Load data from JSON file
+            List<Product> initialProducts = new ArrayList<>();
+            try {
+                // Read JSON file from res/raw
+                InputStream is = context.getResources().openRawResource(R.raw.product_data);
+                byte[] buffer = new byte[is.available()];
+                is.read(buffer);
+                is.close();
+                String json = new String(buffer, "UTF-8");
+
+                // Parse JSON
+                JSONArray jsonArray = new JSONArray(json);
+                Log.d(TAG, "Number of products in JSON: " + jsonArray.length());
+                for (int i = 0; i < jsonArray.length(); i++) {
+                    JSONObject jsonObject = jsonArray.getJSONObject(i);
+                    initialProducts.add(new Product(
+                            jsonObject.getString("product_name"),
+                            jsonObject.getString("price"),
+                            jsonObject.getString("origin"),
+                            jsonObject.getString("pre_order_date"),
+                            jsonObject.getString("pickup_date"),
+                            jsonObject.getString("product_details"),
+                            jsonObject.getString("link")
+                    ));
+                }
+            } catch (Exception e) {
+                Log.e(TAG, "Failed to load JSON data: " + e.getMessage(), e);
+            }
+
+            // Insert into database
+            Log.d(TAG, "Number of products to insert: " + initialProducts.size());
+            if (!initialProducts.isEmpty()) {
                 db.productDao().insertAll(initialProducts);
             }
 
@@ -48,7 +74,9 @@ public class ProductData {
         if (!isDatabaseInitialized) {
             throw new IllegalStateException("Database not initialized. Call initializeDatabase() first.");
         }
-        return db.productDao().getAllProducts();
+        List<Product> products = db.productDao().getAllProducts();
+        Log.d(TAG, "Number of products retrieved from database: " + products.size());
+        return products;
     }
 
     // Helper method to sort products by pre_order_date (newest first)

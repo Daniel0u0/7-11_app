@@ -5,12 +5,12 @@ import androidx.room.PrimaryKey;
 import java.io.Serializable;
 
 @Entity(tableName = "products")
-public class Product implements Serializable { // Added Serializable
+public class Product implements Serializable {
     @PrimaryKey(autoGenerate = true)
     private long id;
 
     private String product_name;
-    private String price; // Keeping as String to match JSON format
+    private String price;
     private String origin;
     private String pre_order_date;
     private String pickup_date;

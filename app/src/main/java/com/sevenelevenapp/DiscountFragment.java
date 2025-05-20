@@ -31,7 +31,7 @@ public class DiscountFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_discount, container, false);
 
-        productList = view.findViewById(R.id.discount_product_list); // Updated ID to match fragment_discount.xml
+        productList = view.findViewById(R.id.discount_product_list);
         loadingIndicator = view.findViewById(R.id.loading_indicator);
 
         // Setup RecyclerView with GridLayoutManager (2x2 grid)
@@ -51,22 +51,25 @@ public class DiscountFragment extends Fragment {
     private void loadProductData() {
         loadingIndicator.setVisibility(View.VISIBLE);
 
-        List<Product> products = ProductData.getSortedProducts(); // Using standalone Product class
+        List<Product> products = ProductData.getSortedProducts();
         Log.d(TAG, "Number of products loaded: " + products.size());
 
         // Filter for discounted products (example)
         List<Product> discountedProducts = new ArrayList<>();
         for (Product product : products) {
-            // Example: Consider products with price < $200 as discounted
             try {
-                double price = Double.parseDouble(product.getPrice().replace("$", ""));
+                // Remove "$" and any spaces, then parse the price
+                String priceString = product.getPrice().replace("$", "").replaceAll("\\s+", "");
+                double price = Double.parseDouble(priceString);
+                Log.d(TAG, "Parsed price for " + product.getProduct_name() + ": " + price);
                 if (price < 200) {
                     discountedProducts.add(product);
                 }
             } catch (NumberFormatException e) {
-                Log.e(TAG, "Failed to parse price: " + product.getPrice(), e);
+                Log.e(TAG, "Failed to parse price: " + product.getPrice() + ", skipping product", e);
             }
         }
+        Log.d(TAG, "Number of discounted products: " + discountedProducts.size());
 
         List<Product> displayProducts = discountedProducts.subList(0, Math.min(discountedProducts.size(), 5));
         Log.d(TAG, "Number of products to display: " + displayProducts.size());

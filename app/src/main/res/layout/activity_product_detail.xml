@@ -97,9 +97,12 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="16sp"
-                android:textColor="?attr/colorPrimary"
-                android:layout_marginBottom="8dp"
-                android:text="Link: N/A" />
+                android:textColor="#800080"
+            android:layout_marginBottom="8dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:background="?android:attr/selectableItemBackground"
+            android:text="Link: N/A" />
 
         </LinearLayout>
     </ScrollView>
@@ -116,3 +119,4 @@
         app:menu="@menu/bottom_nav_menu" />
 
 </RelativeLayout>
+

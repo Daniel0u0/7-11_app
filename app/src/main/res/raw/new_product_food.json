@@ -1,0 +1,55 @@
+[
+  {
+    "name": "維記草莓+藍莓乳酪 120克",
+    "price": "$8.00",
+    "original_price": "$11.00",
+    "product_details": "",
+    "image": "strawberry_blueberry_yogurt"
+  },
+  {
+    "name": "維記原味乳酪120克",
+    "price": "$8.00",
+    "original_price": "$11.00",
+    "product_details": "",
+    "image": "plain_yogurt"
+  },
+  {
+    "name": "嘉頓雙色忌廉威化荔枝玫瑰味 155克",
+    "price": "$16.00",
+    "product_details": "",
+    "image": "lychee_rose_wafer"
+  },
+  {
+    "name": "嘉頓荔枝玫瑰湯種麵包棒125克",
+    "price": "$16.00",
+    "original_price": "$19.00",
+    "product_details": "",
+    "image": "lychee_rose_breadstick"
+  },
+  {
+    "name": "嘉頓雪芳蛋糕-荔枝玫瑰味60克",
+    "price": "$8.00",
+    "original_price": "$12.00",
+    "product_details": "",
+    "image": "lychee_rose_cake"
+  },
+  {
+    "name": "嘉頓荔枝玫瑰厚切湯種吐司160克",
+    "price": "$13.00",
+    "original_price": "$16.00",
+    "product_details": "",
+    "image": "lychee_rose_toast"
+  },
+  {
+    "name": "Da Dino 開心果奶220毫升",
+    "price": "$19.00",
+    "product_details": "",
+    "image": "pistachio_milk"
+  },
+  {
+    "name": "Da Dino 榛果奶220毫升",
+    "price": "$19.00",
+    "product_details": "",
+    "image": "hazelnut_milk"
+  }
+]
