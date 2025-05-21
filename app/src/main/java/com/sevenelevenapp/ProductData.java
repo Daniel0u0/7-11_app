@@ -1,48 +1,104 @@
 package com.sevenelevenapp;
 
+import android.content.Context;
+import android.util.Log;
+import androidx.room.Room;
+import java.io.InputStream;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 public class ProductData {
-    public static class Product {
-        private String name;
-        private double price;
-        private String imageUrl;
-        private String date; // Added for sorting by newest
+    private static AppDatabase db;
+    private static boolean isDatabaseInitialized = false;
+    private static final String TAG = "ProductData";
 
-        public Product(String name, double price, String imageUrl, String date) {
-            this.name = name;
-            this.price = price;
-            this.imageUrl = imageUrl;
-            this.date = date;
-        }
+    // Initialize the Room database
+    public static void initializeDatabase(Context context) {
+        if (!isDatabaseInitialized) {
+            db = Room.databaseBuilder(context.getApplicationContext(),
+                            AppDatabase.class, "product-database")
+                    .allowMainThreadQueries() // For simplicity; in production, use background threads
+                    .build();
 
-        public String getName() {
-            return name;
-        }
+            // Clear the database to ensure fresh data (for testing purposes)
+            db.clearAllTables();
+            Log.d(TAG, "Database cleared");
 
-        public double getPrice() {
-            return price;
-        }
+            // Load data from JSON file
+            List<Product> initialProducts = new ArrayList<>();
+            try {
+                // Read JSON file from res/raw
+                InputStream is = context.getResources().openRawResource(R.raw.product_data);
+                byte[] buffer = new byte[is.available()];
+                is.read(buffer);
+                is.close();
+                String json = new String(buffer, "UTF-8");
 
-        public String getImageUrl() {
-            return imageUrl;
-        }
+                // Parse JSON
+                JSONArray jsonArray = new JSONArray(json);
+                Log.d(TAG, "Number of products in JSON: " + jsonArray.length());
+                for (int i = 0; i < jsonArray.length(); i++) {
+                    JSONObject jsonObject = jsonArray.getJSONObject(i);
+                    initialProducts.add(new Product(
+                            jsonObject.getString("product_name"),
+                            jsonObject.getString("price"),
+                            jsonObject.getString("origin"),
+                            jsonObject.getString("pre_order_date"),
+                            jsonObject.getString("pickup_date"),
+                            jsonObject.getString("product_details"),
+                            jsonObject.getString("link")
+                    ));
+                }
+            } catch (Exception e) {
+                Log.e(TAG, "Failed to load JSON data: " + e.getMessage(), e);
+            }
 
-        public String getDate() {
-            return date;
+            // Insert into database
+            Log.d(TAG, "Number of products to insert: " + initialProducts.size());
+            if (!initialProducts.isEmpty()) {
+                db.productDao().insertAll(initialProducts);
+            }
+
+            isDatabaseInitialized = true;
         }
     }
 
     public static List<Product> getProducts() {
-        List<Product> products = new ArrayList<>();
-        products.add(new Product("Stitch 深度防水筆袋", 799.00, "https://www.7-eleven.com.hk/product1.jpg", "2025-04-30"));
-        products.add(new Product("Stitch 26\" 防潑水日本旅行箱", 899.00, "https://www.7-eleven.com.hk/product2.jpg", "2025-04-29"));
-        products.add(new Product("迪士尼真優座椅 Stitch (Stitch&Scrump)", 299.00, "https://www.7-eleven.com.hk/product3.jpg", "2025-04-28"));
-        products.add(new Product("i-Smart LED 無框燈鏡", 268.00, "https://www.7-eleven.com.hk/product4.jpg", "2025-04-27"));
-        products.add(new Product("Stitch 系列白色行李箱24\"", 899.00, "https://www.7-eleven.com.hk/product5.jpg", "2025-04-26"));
-        products.add(new Product("Stitch 紙幣1000點快現 (2 個)", 99.00, "https://www.7-eleven.com.hk/product6.jpg", "2025-04-25"));
-        products.add(new Product("i-Smart 1000點快現 Stitch", 438.00, "https://www.7-eleven.com.hk/product7.jpg", "2025-04-24"));
+        if (!isDatabaseInitialized) {
+            throw new IllegalStateException("Database not initialized. Call initializeDatabase() first.");
+        }
+        List<Product> products = db.productDao().getAllProducts();
+        Log.d(TAG, "Number of products retrieved from database: " + products.size());
         return products;
+    }
+
+    // Helper method to sort products by pre_order_date (newest first)
+    public static List<Product> getSortedProducts() {
+        List<Product> sortedProducts = new ArrayList<>(getProducts());
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy年MM月dd日 HH:mm");
+        Collections.sort(sortedProducts, new Comparator<Product>() {
+            @Override
+            public int compare(Product p1, Product p2) {
+                try {
+                    // Extract the start date from the pre_order_date range (e.g., "2024年06月26日 00:00 - 2025年12月31日 23:59")
+                    String startDate1 = p1.getPre_order_date().split(" - ")[0];
+                    String startDate2 = p2.getPre_order_date().split(" - ")[0];
+                    Date date1 = dateFormat.parse(startDate1);
+                    Date date2 = dateFormat.parse(startDate2);
+                    return date2.compareTo(date1); // Sort descending (newest first)
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                    return 0;
+                }
+            }
+        });
+        return sortedProducts;
     }
 }

@@ -1,39 +1,45 @@
 package com.sevenelevenapp;
 
 import android.os.Bundle;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
-import android.widget.ImageView;
+import android.widget.TextView;
+import android.widget.Toast;
 import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
-import com.sevenelevenapp.DiscountFragment;
-import com.sevenelevenapp.HomeFragment;
-import com.sevenelevenapp.PreorderFragment;
-import com.sevenelevenapp.ProductFragment;
-import com.sevenelevenapp.LoginFragment;
-import com.sevenelevenapp.RegisterFragment;
-import com.sevenelevenapp.HelpFragment;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 public class MainActivity extends AppCompatActivity {
 
     private DrawerLayout drawerLayout;
     private NavigationView navigationView;
     private BottomNavigationView bottomNavigationView;
-    private ImageView menuIcon;
     private Button loginButton;
+    private TextView toolbarTitle, toolbarUsername;
+    private ActionBarDrawerToggle drawerToggle;
+    private FirebaseAuth mAuth;
+    private FirebaseFirestore db;
+    private String currentUsername;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        mAuth = FirebaseAuth.getInstance();
+        db = FirebaseFirestore.getInstance();
 
         // Initialize Toolbar
         Toolbar toolbar = findViewById(R.id.toolbar);
@@ -43,53 +49,50 @@ public class MainActivity extends AppCompatActivity {
         drawerLayout = findViewById(R.id.drawer_layout);
         navigationView = findViewById(R.id.nav_view);
         bottomNavigationView = findViewById(R.id.bottom_navigation);
-        menuIcon = findViewById(R.id.menu_icon);
         loginButton = findViewById(R.id.login_button);
+        toolbarTitle = findViewById(R.id.toolbar_title);
+        toolbarUsername = findViewById(R.id.toolbar_username);
 
-        // Open Drawer on Menu Icon Click
-        menuIcon.setOnClickListener(v -> drawerLayout.openDrawer(GravityCompat.START));
-
-        // Navigate to LoginFragment on Login Button Click
-        loginButton.setOnClickListener(v -> {
-            getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.fragment_container, new LoginFragment())
-                    .addToBackStack(null)
-                    .commit();
-            // Deselect all BottomNavigationView items
-            bottomNavigationView.setSelectedItemId(-1);
-            // Deselect all NavigationView items
-            navigationView.setCheckedItem(-1);
-        });
+        // Set up ActionBarDrawerToggle for the hamburger icon
+        drawerToggle = new ActionBarDrawerToggle(
+                this,
+                drawerLayout,
+                toolbar,
+                R.string.navigation_drawer_open,
+                R.string.navigation_drawer_close);
+        drawerLayout.addDrawerListener(drawerToggle);
+        drawerToggle.syncState();
 
         // Navigation Drawer Item Selection
-        navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
-            @Override
-            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                Fragment selectedFragment = getFragmentForMenuItem(item.getItemId());
-                if (selectedFragment != null) {
-                    getSupportFragmentManager().beginTransaction()
-                            .replace(R.id.fragment_container, selectedFragment)
-                            .addToBackStack(null)
-                            .commit();
-                    // Sync BottomNavigationView with NavigationView
-                    if (item.getItemId() != R.id.nav_login_register) {
-                        bottomNavigationView.setSelectedItemId(item.getItemId());
-                    } else {
-                        bottomNavigationView.setSelectedItemId(-1);
-                    }
-                }
-                drawerLayout.closeDrawer(GravityCompat.START);
+        navigationView.setNavigationItemSelectedListener(item -> {
+            Fragment selectedFragment = getFragmentForMenuItem(item.getItemId());
+            if (item.getItemId() == R.id.nav_logout) {
+                logoutUser();
                 return true;
             }
+            if (selectedFragment != null) {
+                navigateToFragment(selectedFragment);
+                if (item.getItemId() != R.id.nav_login_register) {
+                    bottomNavigationView.setSelectedItemId(item.getItemId());
+                } else {
+                    bottomNavigationView.setSelectedItemId(-1);
+                }
+            }
+            drawerLayout.closeDrawer(GravityCompat.START);
+            return true;
         });
 
-        // Load HomeFragment by default
+        // Check user authentication state
+        FirebaseUser currentUser = mAuth.getCurrentUser();
         if (savedInstanceState == null) {
-            getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.fragment_container, new HomeFragment())
-                    .commit();
-            navigationView.setCheckedItem(R.id.nav_home);
-            bottomNavigationView.setSelectedItemId(R.id.nav_home);
+            if (currentUser != null) {
+                fetchUserDataAndNavigate(currentUser, new HomeFragment(), R.id.nav_home);
+            } else {
+                updateUIForLoggedOutUser();
+                navigateToFragment(new LoginFragment());
+                navigationView.setCheckedItem(R.id.nav_login_register);
+                bottomNavigationView.setSelectedItemId(-1);
+            }
         }
 
         // Setup BottomNavigationView
@@ -102,30 +105,45 @@ public class MainActivity extends AppCompatActivity {
                 if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
                     drawerLayout.closeDrawer(GravityCompat.START);
                 } else {
-                    setEnabled(false);
-                    getOnBackPressedDispatcher().onBackPressed();
-                    setEnabled(true);
+                    Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
+                    if (!(currentFragment instanceof HomeFragment) && !(currentFragment instanceof LoginFragment)) {
+                        fetchUserDataAndNavigate(mAuth.getCurrentUser(), new HomeFragment(), R.id.nav_home);
+                    } else if (currentFragment instanceof LoginFragment) {
+                        setEnabled(false);
+                        getOnBackPressedDispatcher().onBackPressed();
+                        setEnabled(true);
+                    } else {
+                        setEnabled(false);
+                        getOnBackPressedDispatcher().onBackPressed();
+                        setEnabled(true);
+                    }
                 }
+            }
+        });
+
+        // Update login button based on user state
+        loginButton.setOnClickListener(v -> {
+            if (mAuth.getCurrentUser() != null) {
+                logoutUser();
+            } else {
+                navigateToFragment(new LoginFragment());
+                bottomNavigationView.setSelectedItemId(-1);
+                navigationView.setCheckedItem(R.id.nav_login_register);
             }
         });
     }
 
-    // Method to set up BottomNavigationView
     public void setupBottomNavigation() {
         bottomNavigationView.setOnItemSelectedListener(item -> {
             Fragment selectedFragment = getFragmentForMenuItem(item.getItemId());
             if (selectedFragment != null) {
-                getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.fragment_container, selectedFragment)
-                        .commit();
-                // Sync NavigationView with BottomNavigationView
+                navigateToFragment(selectedFragment);
                 navigationView.setCheckedItem(item.getItemId());
             }
             return true;
         });
     }
 
-    // Method to determine the fragment based on menu item ID
     private Fragment getFragmentForMenuItem(int itemId) {
         if (itemId == R.id.nav_home) {
             return new HomeFragment();
@@ -138,8 +156,103 @@ public class MainActivity extends AppCompatActivity {
         } else if (itemId == R.id.nav_help) {
             return new HelpFragment();
         } else if (itemId == R.id.nav_login_register) {
-            return new LoginFragment(); // Navigate to LoginFragment by default
+            return new LoginFragment();
         }
         return null;
+    }
+
+    private void navigateToFragment(Fragment fragment) {
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.fragment_container, fragment)
+                .addToBackStack(null)
+                .commit();
+
+        // Show username only on HomeFragment when logged in
+        FirebaseUser currentUser = mAuth.getCurrentUser();
+        if (currentUser != null && fragment instanceof HomeFragment) {
+            toolbarUsername.setText(currentUsername != null ? currentUsername : "");
+            toolbarUsername.setVisibility(View.VISIBLE);
+            loginButton.setVisibility(View.GONE);
+        } else {
+            toolbarUsername.setVisibility(View.GONE);
+            loginButton.setVisibility(View.VISIBLE);
+        }
+    }
+
+    private void fetchUserDataAndNavigate(FirebaseUser user, Fragment fragment, int navItemId) {
+        if (user == null) {
+            updateUIForLoggedOutUser();
+            navigateToFragment(new LoginFragment());
+            navigationView.setCheckedItem(R.id.nav_login_register);
+            bottomNavigationView.setSelectedItemId(-1);
+            return;
+        }
+
+        db.collection("users").document(user.getUid()).get()
+                .addOnSuccessListener(document -> {
+                    if (document.exists()) {
+                        RegisterFragment.User userData = document.toObject(RegisterFragment.User.class);
+                        if (userData != null) {
+                            currentUsername = userData.getUsername();
+                        } else {
+                            currentUsername = null;
+                        }
+                    } else {
+                        currentUsername = null;
+                    }
+                    updateUIForLoggedInUser(user);
+                    getSupportFragmentManager().beginTransaction()
+                            .replace(R.id.fragment_container, fragment)
+                            .commit();
+                    navigationView.setCheckedItem(navItemId);
+                    bottomNavigationView.setSelectedItemId(navItemId);
+                })
+                .addOnFailureListener(e -> {
+                    Toast.makeText(this, "Failed to fetch user info: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                    updateUIForLoggedOutUser();
+                    navigateToFragment(new LoginFragment());
+                    navigationView.setCheckedItem(R.id.nav_login_register);
+                    bottomNavigationView.setSelectedItemId(-1);
+                });
+    }
+
+    public void onUserLoggedIn(FirebaseUser user) {
+        fetchUserDataAndNavigate(user, new HomeFragment(), R.id.nav_home);
+    }
+
+    private void updateUIForLoggedInUser(FirebaseUser user) {
+        loginButton.setText("Logout");
+        if (getSupportFragmentManager().findFragmentById(R.id.fragment_container) instanceof HomeFragment) {
+            toolbarUsername.setText(currentUsername != null ? currentUsername : "");
+            toolbarUsername.setVisibility(View.VISIBLE);
+            loginButton.setVisibility(View.GONE);
+        }
+
+        // Update NavigationView menu
+        Menu menu = navigationView.getMenu();
+        menu.findItem(R.id.nav_login_register).setVisible(false);
+        menu.findItem(R.id.nav_logout).setVisible(true);
+    }
+
+    private void updateUIForLoggedOutUser() {
+        loginButton.setText("Login");
+        toolbarTitle.setText("Hong Kong 7-11");
+        toolbarUsername.setVisibility(View.GONE);
+        loginButton.setVisibility(View.VISIBLE);
+        currentUsername = null;
+
+        // Update NavigationView menu
+        Menu menu = navigationView.getMenu();
+        menu.findItem(R.id.nav_login_register).setVisible(true);
+        menu.findItem(R.id.nav_logout).setVisible(false);
+    }
+
+    private void logoutUser() {
+        mAuth.signOut();
+        updateUIForLoggedOutUser();
+        navigateToFragment(new LoginFragment());
+        navigationView.setCheckedItem(R.id.nav_login_register);
+        bottomNavigationView.setSelectedItemId(-1);
+        Toast.makeText(this, "Logged out successfully", Toast.LENGTH_SHORT).show();
     }
 }

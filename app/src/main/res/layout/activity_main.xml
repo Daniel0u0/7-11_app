@@ -5,7 +5,7 @@
     android:id="@+id/drawer_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F5F5F5">
+    android:background="@color/off_white">
 
     <!-- Main Content -->
     <LinearLayout
@@ -13,57 +13,69 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
-        <!-- Toolbar with Menu Icon, Title, and Login Button -->
+        <!-- Toolbar with Title, Username, and Login Button -->
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
+            android:layout_height="wrap_content"
             android:background="?attr/colorPrimary"
             android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
             android:popupTheme="@style/ThemeOverlay.AppCompat.Light"
-            android:elevation="4dp">
+            android:elevation="4dp"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:paddingTop="12dp"
+            android:paddingBottom="12dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:gravity="center_vertical">
 
-                <!-- Menu Icon -->
-                <ImageView
-                    android:id="@+id/menu_icon"
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:src="@drawable/need"
-                    android:contentDescription="Menu"
-                    android:layout_marginStart="16dp"/>
-
                 <!-- Title -->
                 <TextView
-                    android:id="@+id/app_title"
+                    android:id="@+id/toolbar_title"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:layout_marginStart="8dp"
                     android:layout_marginEnd="8dp"
-                    android:text="Hong Kong 7-11 New Product Info"
+                    android:text="Hong Kong 7-11"
                     android:textSize="20sp"
                     android:textStyle="bold"
                     android:textColor="?attr/colorOnPrimary"
                     android:gravity="center"
-                    android:ellipsize="end"
-                    android:singleLine="true"/>
+                    android:maxLines="1"
+                    android:ellipsize="end"/>
 
-                <!-- Login Button -->
+                <!-- Username (visible when logged in on HomeFragment) -->
+                <TextView
+                    android:id="@+id/toolbar_username"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="8dp"
+                    android:textSize="14sp"
+                    android:textColor="?attr/colorOnPrimary"
+                    android:visibility="gone"
+                    android:maxLines="1"
+                    android:ellipsize="end"/>
+
+                <!-- Login Button (visible when not on HomeFragment or logged out) -->
                 <Button
                     android:id="@+id/login_button"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginEnd="16dp"
+                    android:layout_marginEnd="8dp"
                     android:text="Login"
                     android:textSize="14sp"
                     android:textColor="?attr/colorOnPrimary"
-                    android:backgroundTint="?attr/colorSecondary"
+                    android:backgroundTint="@color/pastel_purple"
+                    android:foreground="?android:attr/selectableItemBackground"
+                    android:drawableStart="@drawable/ic_login"
+                    android:drawablePadding="8dp"
+                    android:paddingStart="12dp"
+                    android:paddingEnd="12dp"
                     style="@style/Widget.MaterialComponents.Button.TextButton"/>
             </LinearLayout>
         </androidx.appcompat.widget.Toolbar>
@@ -73,16 +85,18 @@
             android:id="@+id/fragment_container"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="1"/>
+            android:layout_weight="1"
+            android:padding="16dp"/>
 
         <!-- Bottom Navigation -->
         <com.google.android.material.bottomnavigation.BottomNavigationView
             android:id="@+id/bottom_navigation"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="?attr/colorPrimary"
-            app:itemIconTint="?attr/colorOnPrimary"
-            app:itemTextColor="?attr/colorOnPrimary"
+            android:background="@drawable/rounded_background"
+            android:elevation="8dp"
+            app:itemIconTint="@color/white"
+            app:itemTextColor="@color/white"
             app:labelVisibilityMode="labeled"
             app:menu="@menu/bottom_nav_menu"/>
 
@@ -94,7 +108,7 @@
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_gravity="start"
-        app:menu="@menu/nav_menu"
-        app:headerLayout="@layout/nav_header"/>
+        android:theme="@style/Theme.SevenElevenApp"
+        app:menu="@menu/nav_menu"/>
 
 </androidx.drawerlayout.widget.DrawerLayout>

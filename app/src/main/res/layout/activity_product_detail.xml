@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="?android:attr/colorBackground">
+
+    <!-- Toolbar (Upper Part) -->
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="?attr/colorPrimary"
+        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+        app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
+        app:title="Product Details"
+        app:titleTextColor="@android:color/white" />
+
+    <!-- Product Details (Middle Part) -->
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/toolbar"
+        android:layout_above="@id/bottom_navigation">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <!-- Product Name -->
+            <TextView
+                android:id="@+id/detail_product_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:textColor="?attr/colorOnBackground"
+                android:layout_marginBottom="8dp"
+                android:text="Product Name" />
+
+            <!-- Price -->
+            <TextView
+                android:id="@+id/detail_product_price"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="18sp"
+                android:textColor="?attr/colorOnBackground"
+                android:layout_marginBottom="8dp"
+                android:text="$799.00" />
+
+            <!-- Origin -->
+            <TextView
+                android:id="@+id/detail_product_origin"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="16sp"
+                android:textColor="?attr/colorOnBackground"
+                android:layout_marginBottom="8dp"
+                android:text="Origin: N/A" />
+
+            <!-- Pre-Order Date -->
+            <TextView
+                android:id="@+id/detail_pre_order_date"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="16sp"
+                android:textColor="?attr/colorOnBackground"
+                android:layout_marginBottom="8dp"
+                android:text="Pre-Order Date: N/A" />
+
+            <!-- Pickup Date -->
+            <TextView
+                android:id="@+id/detail_pickup_date"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="16sp"
+                android:textColor="?attr/colorOnBackground"
+                android:layout_marginBottom="8dp"
+                android:text="Pickup Date: N/A" />
+
+            <!-- Product Details -->
+            <TextView
+                android:id="@+id/detail_product_details"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="16sp"
+                android:textColor="?attr/colorOnBackground"
+                android:layout_marginBottom="8dp"
+                android:text="Product Details" />
+
+            <!-- Link -->
+            <TextView
+                android:id="@+id/detail_product_link"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="16sp"
+                android:textColor="#800080"
+            android:layout_marginBottom="8dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:background="?android:attr/selectableItemBackground"
+            android:text="Link: N/A" />
+
+        </LinearLayout>
+    </ScrollView>
+
+    <!-- Bottom Navigation View (Bottom Part) -->
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/bottom_navigation"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        app:itemIconTint="@color/white"
+        app:itemTextColor="@color/white"
+        android:background="@drawable/rounded_background"
+        app:menu="@menu/bottom_nav_menu" />
+
+</RelativeLayout>
+

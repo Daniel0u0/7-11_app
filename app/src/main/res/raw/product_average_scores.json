@@ -1,0 +1,34 @@
+[
+  {
+    "product_name":"Da Dino 榛果奶220毫升",
+    "average_sentiment_score":6.23
+  },
+  {
+    "product_name":"Da Dino 開心果奶220毫升",
+    "average_sentiment_score":5.62
+  },
+  {
+    "product_name":"嘉頓荔枝玫瑰厚切湯種吐司160克",
+    "average_sentiment_score":5.24
+  },
+  {
+    "product_name":"嘉頓荔枝玫瑰湯種麵包棒125克",
+    "average_sentiment_score":5.12
+  },
+  {
+    "product_name":"嘉頓雙色忌廉威化荔枝玫瑰味 155克",
+    "average_sentiment_score":5.56
+  },
+  {
+    "product_name":"嘉頓雪芳蛋糕-荔枝玫瑰味60克",
+    "average_sentiment_score":5.94
+  },
+  {
+    "product_name":"維記原味乳酪120克",
+    "average_sentiment_score":5.76
+  },
+  {
+    "product_name":"維記草莓+藍莓乳酪 120克",
+    "average_sentiment_score":5.88
+  }
+]

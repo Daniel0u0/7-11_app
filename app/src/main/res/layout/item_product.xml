@@ -4,36 +4,29 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="150dp"
     android:layout_height="wrap_content"
-    android:layout_margin="8dp"
+    android:layout_margin="12dp"
     app:cardCornerRadius="8dp"
-    app:cardElevation="4dp">
+    app:cardElevation="4dp"
+    app:cardBackgroundColor="@android:color/transparent">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="8dp">
+        android:padding="12dp"
+        android:background="@android:color/transparent">
 
-        <!-- Product Image -->
-        <ImageView
-            android:id="@+id/product_image"
-            android:layout_width="match_parent"
-            android:layout_height="120dp"
-            android:scaleType="centerCrop"
-            android:contentDescription="Product Image"/>
-
-        <!-- Promotion Banner -->
+        <!-- Product Name -->
         <TextView
-            android:id="@+id/promotion_text"
-            android:layout_width="match_parent"
+            android:id="@+id/product_name"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:textSize="12sp"
-            android:textColor="#FFFFFF"
-            android:background="#FF69B4"
-            android:padding="4dp"
-            android:visibility="gone"
-            android:text="7-Eleven獨家 $1000 優惠券 $200"/>
+            android:layout_marginTop="8dp"
+            android:textSize="14sp"
+            android:textColor="?attr/colorOnBackground"
+            android:maxLines="2"
+            android:ellipsize="end"
+            android:text="Product Name" />
 
         <!-- Price -->
         <TextView
@@ -43,41 +36,34 @@
             android:layout_marginTop="4dp"
             android:textSize="16sp"
             android:textStyle="bold"
-            android:textColor="#000000"
-            android:text="$799.00"/>
+            android:textColor="?attr/colorOnBackground"
+            android:text="$799.00" />
 
-        <!-- Product Name -->
+        <!-- Details Link -->
         <TextView
-            android:id="@+id/product_name"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:textSize="14sp"
-            android:textColor="#000000"
-            android:maxLines="2"
-            android:ellipsize="end"
-            android:text="Stitch 深度防水筆袋"/>
-
-        <!-- Sentiment Score -->
-        <TextView
-            android:id="@+id/sentiment_score"
+            android:id="@+id/details_link"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
             android:textSize="12sp"
-            android:textColor="#666666"
-            android:text="Sentiment Score: N/A"/>
+            android:textStyle="bold"
+            android:text="Details"
+            android:clickable="true"
+            android:focusable="true"
+            android:background="?android:attr/selectableItemBackground" />
 
-        <!-- Add to Shopping Cart Button -->
+        <!-- Add to Shopping Cart Button (Optional, for future use) -->
         <Button
             android:id="@+id/add_to_cart_button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="12dp"
             android:text="加入購物車"
             android:textSize="12sp"
-            android:textColor="#FFFFFF"
-            android:backgroundTint="#4CAF50"
-            style="@style/Widget.MaterialComponents.Button"/>
+            android:textColor="@android:color/black"
+            android:backgroundTint="?attr/colorSecondary"
+            style="@style/Widget.MaterialComponents.Button"
+            android:visibility="gone" />
+
     </LinearLayout>
 </androidx.cardview.widget.CardView>

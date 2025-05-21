@@ -4,7 +4,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fillViewport="true"
-    android:background="#F5F5F5">
+    android:background="?android:attr/colorBackground"
+    android:theme="@style/Theme.SevenElevenApp">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -13,22 +14,40 @@
         android:padding="16dp">
 
         <!-- Nearest Store Section -->
-        <TextView
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Nearest 7-11 Store"
-            android:textSize="20sp"
-            android:textStyle="bold"
-            android:textColor="#000000"/>
+            android:orientation="vertical"
+            android:padding="16dp">
 
-        <TextView
-            android:id="@+id/nearest_store"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:text="Fetching location..."
-            android:textSize="16sp"
-            android:textColor="#666666"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Nearest 7-11 Store"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:textColor="?attr/colorOnBackground"/>
+
+            <TextView
+                android:id="@+id/nearest_store_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="Fetching store..."
+                android:textSize="16sp"
+                android:textColor="?attr/colorOnBackground"/>
+
+            <TextView
+                android:id="@+id/nearest_store_address"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:text="Address: Fetching..."
+                android:textSize="14sp"
+                android:textColor="?attr/colorOnBackground"
+                android:alpha="0.7"/>
+
+        </LinearLayout>
 
         <!-- Newest Product Section -->
         <TextView
@@ -38,14 +57,15 @@
             android:text="Newest Product"
             android:textSize="20sp"
             android:textStyle="bold"
-            android:textColor="#000000"/>
+            android:textColor="?attr/colorOnBackground"/>
 
-        <!-- ListView for Product List -->
-        <ListView
+        <!-- RecyclerView for 2x2 Grid Layout -->
+        <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/product_list"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"/>
+            android:layout_marginTop="8dp"
+            android:scrollbars="vertical"/>
 
         <!-- Loading Indicator -->
         <ProgressBar
