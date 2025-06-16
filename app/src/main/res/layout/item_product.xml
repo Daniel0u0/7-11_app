@@ -39,6 +39,17 @@
             android:textColor="?attr/colorOnBackground"
             android:text="$799.00" />
 
+        <!-- Sentiment Score -->
+        <TextView
+            android:id="@+id/product_sentiment_score"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:textSize="12sp"
+            android:textColor="?attr/colorOnBackground"
+            android:text="Avg. Sentiment: 6.23"
+            android:visibility="visible" />
+
         <!-- Details Link -->
         <TextView
             android:id="@+id/details_link"

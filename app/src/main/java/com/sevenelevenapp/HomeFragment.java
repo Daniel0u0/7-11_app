@@ -47,6 +47,7 @@ public class HomeFragment extends Fragment {
         hardcodedStores.add(new Store("7-Eleven Tsim Sha Tsui", "789 Nathan Road, Kowloon, Hong Kong", 22.3000, 114.1720));
         hardcodedStores.add(new Store("7-Eleven Sham Shui Po", "123 Cheung Sha Wan Road, Sham Shui Po, Hong Kong", 22.3300, 114.1600));
         hardcodedStores.add(new Store("7-Eleven Causeway Bay", "456 Hennessy Road, Causeway Bay, Hong Kong", 22.2790, 114.1830));
+        hardcodedStores.add(new Store("7-Eleven (Huimao Center Store)", "New Trade Plaze, Hong Kong", 22.3901, 114.2070));
     }
 
     @Override
